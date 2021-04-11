@@ -1,6 +1,6 @@
 # Carpeta Data y Recibidos
-data/**
-recibidos/**
+data/prueba*
+recibidos/archivo*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
