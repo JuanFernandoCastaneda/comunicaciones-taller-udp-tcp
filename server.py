@@ -31,7 +31,7 @@ while True:
     elif event == sg.WIN_CLOSED:
         quit()
 
-if(tamanioArchivo == 100):
+if(tamanioArchivo[0] == 100):
     rutaArchivo = "data/prueba1.txt"
 else:
     rutaArchivo = "data/prueba2.txt"
