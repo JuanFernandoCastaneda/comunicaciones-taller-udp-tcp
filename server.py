@@ -17,10 +17,9 @@ logging.basicConfig(format='%(asctime)s - %(message)s', filename=("./Logs/Server
 
 # Interfaz --------------------------------------
 
-tamanioArchivo = int(sys.argv[1])
-maxConexiones = int(sys.argv[2])
-print(tamanioArchivo)
-print(maxConexiones)
+tamanioArchivo = int(sys.argv[1])  # Tamaño del archivo a utilizar. Opciones disponibles: 100, 250
+maxConexiones = int(
+    sys.argv[2])  # Cantidad de conexiones que el servidor debe esperar antes de empezar a enviar el archivo
 
 # =============================================================================
 # layout = [
@@ -62,7 +61,7 @@ logging.info(
 # Lógica --------------------------------------
 
 # Dirección y puertos usados para cada servicio.
-localIP = "127.0.0.1"
+localIP = "0.0.0.0"
 puertoTcp = 20005
 puertoUdp = 20006
 # Tamaño máximo del buffer en cada servicio.
@@ -95,14 +94,14 @@ def client_thread(conexionActual, index):
     archivo = open(rutaArchivo, "rb")
     # Esta i es solo para saber cuántos paquetes se terminan enviando (al otro lado podemos contar, creo). 
     i = 0
-    start = time.time_ns() / 1000000
+    start = time.time() * 1000
     while True:
         fragmento = archivo.read(bufferUdp)
         i += 1
         if not fragmento: break
         udpSocket.sendto(fragmento, cliente[1])
         h.update(fragmento)
-    end = time.time_ns() / 1000000
+    end = time.time() * 1000
     logging.info("Cantidad de paquetes enviados para el Cliente " + str(index) + ": " + str(i))
     logging.info("Tiempo total que tomo el envio para el Cliente " + str(index) + ": " + str(end - start) + "millis")
     # Envio de hash del archivo por TCP

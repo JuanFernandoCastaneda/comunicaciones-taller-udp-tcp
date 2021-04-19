@@ -14,7 +14,7 @@ logging.basicConfig(format='%(asctime)s - %(message)s', filename=("./Logs/Client
                     level=logging.DEBUG)
 
 # Dirección y puertos usados para cada servicio.
-localIP = sys.argv[1] #"127.0.0.1"
+localIP = sys.argv[1]  # IP del servidor
 puertoTcp = 20005
 puertoUdp = 20006
 # Tamaño máximo del buffer en cada servicio.
@@ -53,7 +53,7 @@ while True:
     # Ready parece ser si el puerto UDP envió algo antes del timeout.
     if ready[0]:
         if first:
-            start = time.time_ns() / 1000000
+            start = time.time() / 1000
         datagramaActual = udpSocket.recv(bufferUdp)
         archivo.write(datagramaActual)
         h.update(datagramaActual)
@@ -61,7 +61,7 @@ while True:
         paquetes += 1
     else:
         size = os.stat(PATH_FILE).st_size
-        end = time.time_ns() / 1000000
+        end = time.time() * 1000
         logging.info("Archivo " + id + " guardado en" + PATH_FILE)
         logging.info("Cantidad de paquetes recibidos del archivo " + id + ": " + str(paquetes) + " paquetes")
         print("Tamaño del Archivo", id, "recibido", size, "Bytes")
