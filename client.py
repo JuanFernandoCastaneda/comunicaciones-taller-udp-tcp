@@ -1,5 +1,16 @@
 import socket
 import select
+import time
+import os
+import hashlib
+import logging
+import datetime
+
+# Log Config ------------------------------------
+date = datetime.datetime.now()
+date = date.strftime("%Y-%b-%d-%H-%M-%S")
+logging.basicConfig(format='%(asctime)s - %(message)s', filename=("./Logs/Client/" + date + "-log.txt"),
+                    level=logging.DEBUG)
 
 # Dirección y puertos usados para cada servicio.
 localIP = "127.0.0.1"
@@ -19,23 +30,53 @@ udpSocket = socket.socket(socket.AF_INET, type=socket.SOCK_DGRAM)
 
 # Recepción del mensaje TCP con el id del cliente y apertura del stream con el archivo. 
 id = tcpSocket.recv(bufferTcp).decode()
+numClientes = tcpSocket.recv(bufferTcp).decode()
+PATH_FILE = "recibidos/Cliente" + id + "-Prueba-" + numClientes + ".txt"
 print("Mensaje TCP (id): " + id, flush=True)
-archivo = open("recibidos/archivo"+id+".txt", "wb")
+logging.info("id cliente: " + id)
+archivo = open(PATH_FILE, "wb")
 
 # Envío de mensaje sin importancia al servidor a través de UDP para posibilitar la conexión.
 udpSocket.sendto(b"Hi", (localIP, puertoUdp))
+print("Cliente esperando por respueta del servidor...", flush=True)
 
+h = hashlib.sha256()
+
+start, end = 0, 0
+first = True
+paquetes = 0
 # Ciclo que maneja la recepción del archivo enviado por UDP.
 while True:
-    # Aquí lo importante es que se incluye el parámetro timeout. 
+    # Aquí lo importante es que se incluye el parámetro timeout.
     ready = select.select([udpSocket], [], [], timeout)
     # Ready parece ser si el puerto UDP envió algo antes del timeout.
     if ready[0]:
+        if first:
+            start = time.time_ns() / 1000000
         datagramaActual = udpSocket.recv(bufferUdp)
         archivo.write(datagramaActual)
+        h.update(datagramaActual)
+        first = False
+        paquetes += 1
     else:
+        size = os.stat(PATH_FILE).st_size
+        end = time.time_ns() / 1000000
+        logging.info("Archivo " + id + " guardado en" + PATH_FILE)
+        logging.info("Cantidad de paquetes recibidos del archivo " + id + ": " + str(paquetes) + "Bytes")
+        print("Tamaño del Archivo", id, "recibido", size, "Bytes")
+        logging.info("Cantidad de bytes recibidos archivo " + id + ":" + str(size) + "Bytes")
+        logging.info("El tiempo total de la transferencia fue de " + str(end - start) + "ms")
         archivo.close()
         break
 
-print("Archivo "+id+" enviado.", flush=True)
+hash_server = tcpSocket.recv(bufferTcp).decode()
+hash_client = h.hexdigest()
 
+if hash_server == hash_client:
+    print("Archivo correcto")
+    logging.info("Archivo recibido correctamente, codigos hash coinciden")
+    tcpSocket.send("OK".encode())
+else:
+    print("Archivo incorrecto")
+    logging.info("Archivo recibido incorrectamente, codigos hash no coinciden")
+    tcpSocket.send("NOT OK".encode())
