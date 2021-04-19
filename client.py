@@ -5,6 +5,7 @@ import os
 import hashlib
 import logging
 import datetime
+import sys
 
 # Log Config ------------------------------------
 date = datetime.datetime.now()
@@ -13,9 +14,9 @@ logging.basicConfig(format='%(asctime)s - %(message)s', filename=("./Logs/Client
                     level=logging.DEBUG)
 
 # Dirección y puertos usados para cada servicio.
-localIP = "127.0.0.1"
-puertoTcp = 20001
-puertoUdp = 20002
+localIP = sys.argv[1] #"127.0.0.1"
+puertoTcp = 20005
+puertoUdp = 20006
 # Tamaño máximo del buffer en cada servicio.
 bufferTcp = 1024
 bufferUdp = 65507
@@ -62,9 +63,9 @@ while True:
         size = os.stat(PATH_FILE).st_size
         end = time.time_ns() / 1000000
         logging.info("Archivo " + id + " guardado en" + PATH_FILE)
-        logging.info("Cantidad de paquetes recibidos del archivo " + id + ": " + str(paquetes) + "Bytes")
+        logging.info("Cantidad de paquetes recibidos del archivo " + id + ": " + str(paquetes) + " paquetes")
         print("Tamaño del Archivo", id, "recibido", size, "Bytes")
-        logging.info("Cantidad de bytes recibidos archivo " + id + ":" + str(size) + "Bytes")
+        logging.info("Cantidad de bytes recibidos archivo " + id + ": " + str(size) + " Bytes")
         logging.info("El tiempo total de la transferencia fue de " + str(end - start) + "ms")
         archivo.close()
         break

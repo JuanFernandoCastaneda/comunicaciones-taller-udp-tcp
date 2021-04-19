@@ -1,10 +1,11 @@
 import socket
-import PySimpleGUI as sg
+# import PySimpleGUI as sg
 import threading
 import hashlib
 import time
 import logging
 import datetime
+import sys
 import os
 from collections import deque
 
@@ -16,47 +17,54 @@ logging.basicConfig(format='%(asctime)s - %(message)s', filename=("./Logs/Server
 
 # Interfaz --------------------------------------
 
-layout = [
-    [sg.Text("Elija el tamaño del archivo (en MB)"), ],
-    [sg.Listbox(values=[100, 250], enable_events=True, size=(20, 2), key="-ARCHIVO-")],
-    [sg.Text("Elija la cantidad de clientes en simultáneo"), ],
-    [sg.InputText(size=(30, 1), key="-CONEXIONES-")],
-    [sg.Button("Ok")]
-]
-window = sg.Window("Servidor", layout)
+tamanioArchivo = int(sys.argv[1])
+maxConexiones = int(sys.argv[2])
+print(tamanioArchivo)
+print(maxConexiones)
 
-while True:
-    # Manejo básico de la interfaz.
-    event, values = window.read()
-    if event == "Ok":
-        tamanioArchivo = values["-ARCHIVO-"]
-        maxConexiones = int(values["-CONEXIONES-"])
-        # Verificación del número de conexiones.
-        if len(tamanioArchivo) == 0:
-            sg.Popup("Seleccione un archivo", keep_on_top=True)
-        elif maxConexiones > 25:
-            sg.Popup("Inserte un número de conexiones menor o igual a 25", keep_on_top=True)
-        else:
-            window.close()
-            break
-    elif event == sg.WIN_CLOSED:
-        quit()
+# =============================================================================
+# layout = [
+#     [sg.Text("Elija el tamaño del archivo (en MB)"), ],
+#     [sg.Listbox(values=[100, 250], enable_events=True, size=(20, 2), key="-ARCHIVO-")],
+#     [sg.Text("Elija la cantidad de clientes en simultáneo"), ],
+#     [sg.InputText(size=(30, 1), key="-CONEXIONES-")],
+#     [sg.Button("Ok")]
+# ]
+# window = sg.Window("Servidor", layout)
+# 
+# while True:
+#     # Manejo básico de la interfaz.
+#     event, values = window.read()
+#     if event == "Ok":
+#         tamanioArchivo = values["-ARCHIVO-"]
+#         maxConexiones = int(values["-CONEXIONES-"])
+#         # Verificación del número de conexiones.
+#         if len(tamanioArchivo) == 0:
+#             sg.Popup("Seleccione un archivo", keep_on_top=True)
+#         elif maxConexiones > 25:
+#             sg.Popup("Inserte un número de conexiones menor o igual a 25", keep_on_top=True)
+#         else:
+#             window.close()
+#             break
+#     elif event == sg.WIN_CLOSED:
+#         quit()
+# =============================================================================
 
-if tamanioArchivo[0] == 100:
+if tamanioArchivo == 100:
     rutaArchivo = "data/prueba1.txt"
 else:
     rutaArchivo = "data/prueba2.txt"
 
-logging.info("Nombre del archivo: " + "prueba1.txt" if tamanioArchivo[0] else "prueba2.txt")
+logging.info("Nombre del archivo: " + "prueba1.txt" if tamanioArchivo == 100 else "prueba2.txt")
 logging.info(
-    "Tamaño del archivo a enviar: " + str(os.stat("data/prueba1.txt").st_size if tamanioArchivo[0] else os.stat(
+    "Tamaño del archivo a enviar: " + str(os.stat("data/prueba1.txt").st_size if tamanioArchivo == 100 else os.stat(
         "data/prueba2.txt").st_size) + "Bytes")
 # Lógica --------------------------------------
 
 # Dirección y puertos usados para cada servicio.
 localIP = "127.0.0.1"
-puertoTcp = 20001
-puertoUdp = 20002
+puertoTcp = 20005
+puertoUdp = 20006
 # Tamaño máximo del buffer en cada servicio.
 bufferTcp = 1024
 bufferUdp = 65507
