@@ -21,11 +21,12 @@ puertoUdp = 20006
 bufferTcp = 1024
 bufferUdp = 65507
 # Tiempo (creo que en segundos) que espera la conexión UDP para cerrarse después de no recibir más mensajes.
-timeout = 2
+timeout = 5
 
 # Establecimiento y conexión puerto TCP con el servidor.
 tcpSocket = socket.socket(socket.AF_INET, type=socket.SOCK_STREAM)
 tcpSocket.connect((localIP, puertoTcp))
+logging.info("Puerto TCP del cliente: " + str(tcpSocket.getsockname()[1]))
 # Creación cascarón puerto UDP.
 udpSocket = socket.socket(socket.AF_INET, type=socket.SOCK_DGRAM)
 
@@ -39,6 +40,7 @@ archivo = open(PATH_FILE, "wb")
 
 # Envío de mensaje sin importancia al servidor a través de UDP para posibilitar la conexión.
 udpSocket.sendto(b"Hi", (localIP, puertoUdp))
+logging.info("Puerto UDP del cliente: " + str(udpSocket.getsockname()[1]))
 print("Cliente esperando por respueta del servidor...", flush=True)
 
 h = hashlib.sha256()
@@ -53,7 +55,7 @@ while True:
     # Ready parece ser si el puerto UDP envió algo antes del timeout.
     if ready[0]:
         if first:
-            start = time.time() / 1000
+            start = time.time() * 1000
         datagramaActual = udpSocket.recv(bufferUdp)
         archivo.write(datagramaActual)
         h.update(datagramaActual)
