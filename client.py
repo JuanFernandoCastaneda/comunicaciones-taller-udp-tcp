@@ -33,7 +33,7 @@ udpSocket = socket.socket(socket.AF_INET, type=socket.SOCK_DGRAM)
 # Recepción del mensaje TCP con el id del cliente y apertura del stream con el archivo. 
 id = tcpSocket.recv(bufferTcp).decode()
 numClientes = tcpSocket.recv(bufferTcp).decode()
-PATH_FILE = "recibidos/Cliente" + id + "-Prueba-" + numClientes + ".txt"
+PATH_FILE = "ArchivosRecibidos/Cliente" + id + "-Prueba-" + numClientes + ".txt"
 print("Mensaje TCP (id): " + id, flush=True)
 logging.info("id cliente: " + id)
 archivo = open(PATH_FILE, "wb")
